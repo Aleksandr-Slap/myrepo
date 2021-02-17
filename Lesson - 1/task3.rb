@@ -5,15 +5,25 @@ b = gets.chomp.to_i
 c = gets.chomp.to_i
 sides = []
 sides.push a, b, c
-sides.sort
+sides = sides.sort
 
 
-if a == b && a == b && b != c
+a = sides[0]
+b = sides[1]
+c = sides[2]
+
+
+
+if  c == b && b != a
   puts "Треугольник равнобедренный"
 elsif  a**2 + b**2 == c**2
   puts "Треугольник прямоугольный"	
 elsif a == b && b == c
-	puts "Треугольник равтосторонний"
+  puts "Треугольник равтосторонний"
+elsif (a + b) < c
+  puts "Такого треугольника не существует"
  else
- 	puts "Такого треугольника не существует"
+  puts "Ваш треугольник не равтосторонний, не равнобедренный и не прямоугольный"
 end 	
+
+
