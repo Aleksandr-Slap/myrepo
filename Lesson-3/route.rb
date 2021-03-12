@@ -1,14 +1,12 @@
 class Route
-  attr_reader :first_station, :last_station, :all_stations
+  attr_reader :first_station, :last_station
 
   def initialize (first_station,
                   last_station,
-                  intermediate_station = [],
-                  all_stations = [] )
+                  intermediate_station = [])
     @first_station = first_station
     @last_station = last_station
     @intermediate_station = intermediate_station
-    @all_stations = all_stations
   end
 
   def add_station(station)
@@ -20,7 +18,6 @@ class Route
   end
 
   def all_station
-    @all_stations = [@first_station] + @intermediate_station + [@last_station]
-    @all_stations
+    [@first_station] + @intermediate_station + [@last_station]
   end
 end
