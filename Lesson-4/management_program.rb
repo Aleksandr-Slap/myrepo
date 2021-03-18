@@ -1,34 +1,48 @@
-puts "Введите 1, если вы хотите создать станцию, поезд, вагон или маршрут"
-puts "Введите 2, если вы хотите произвести операции с созданными объектами"
-puts "Введите 3, если вы хотите вывести текущие данные об оъектах"
-puts "Введите 0, если хотите закончить программу"
+class Interface
+  def initialize
+    @stations = []
+    @trains = []
+    @routes = []
+  end
 
-choice = gets.chomp
+  def start!
+    loop do
+      puts "Введите 1, если вы хотите создать станцию, поезд, вагон или маршрут"
+      puts "Введите 2, если вы хотите произвести операции с созданными объектами"
+      puts "Введите 3, если вы хотите вывести текущие данные об оъектах"
+      puts "Введите 0, если хотите закончить программу"
 
-while choice != "0"
+      choice = gets.chomp
+      case choice
+      when "1"
+        create_objects
+      when "2"
+        manage_objects
+      when "3"
+        show_objects
+      when "0"
+        break
+      end
+    end
+  end
 
-  case choice
-
-
-  when "1"
+  def create_objects
     puts "Введите 1, если вы хотите создать станцию(создайте минимум две станции)"
     puts "Введите 2, если вы хотите создать маршрут"
     puts "Введите 3, если вы хотите создать пассажирский поезд"
     puts "Введите 4, если вы хотите создать почтовый поезд"
     puts "Введите 5, если вы хотите создать пассажирский вагон"
     puts "Введите 6, если вы хотите создать почтовый вагон"
+    puts "Введите 0, если вы хотите выйти из меню"
 
-    choice = gets.chomp
+    choice = gets.chomp.to_i
 
-    if choice = "1"
-      stations = []
-      puts "Введите название станции"
-      name_of_station = gets.chomp
-      Station.new(name_of_station)
-      puts "Вы создали станцию " + "#{Station.new(name_of_station)}"
-      stations << Station.new(name_of_station)
-      p
-    elsif choice == "2"
+    case choice
+    when 0
+      return
+    when 1
+      create_station
+    when "2"
       all_stations = []
       intermediate_stations = []
       puts "Что бы создать маршрут, вы должны были создать как минимум 2 станции"
@@ -40,12 +54,12 @@ while choice != "0"
       intermediate_station = gets.chomp
       intermediate_stations << intermediate_station
       Route.new(first_station,last_station)
-      all_stations << [first_station] + intermediate_station + [last_station] 
+      all_stations << [first_station] + intermediate_station + [last_station]
       puts "Маршрут создан: #{all_stations}"
     elsif choice == "3"
       trains = []
       puts "Введите номер поезда"
-      train_number = gets.chomp 
+      train_number = gets.chomp
       PassengerTrain.new(train_number)
       puts "Вы создали пассажирский поезд " + "#{PassengerTrain.new(train_number)}"
       trains << PassengerTrain.new(train_number)
@@ -53,11 +67,11 @@ while choice != "0"
       trains = []
       # trains_cargo = []
       puts "Введите номер вагона"
-      train_cargo_number = gets.chomp 
+      train_cargo_number = gets.chomp
       CargoTrain.new(train_cargo_number)
       puts "Вы создали пассажирский поезд " + "#{CargoTrain.new(train_cargo_number)}"
       trains << CargoTrain.new(train_cargo_number)
-      puts trains.size 
+      puts trains.size
     elsif choice == "5"
       vagons = []
       puts "Введите номер вагона"
@@ -75,33 +89,30 @@ while choice != "0"
       vagons << CargoVagon.new(vagon_cargo_number)
       puts vagons.size
     end
-  when "2" 
-    puts "Введите 1, если вы хотите назначить маршрут для поезда"
-    puts "Введите 2, если вы хотите проследовать на следующую станцию"
-    puts "Введите 3, если вы хотите проследовать на предыдущую станцию"
-    puts "Введите 4, если вы хотите прицепить вагон к пассажирскому поезду"
-    puts "Введите 5, если вы хотите прицепить вагон к почтовому поезду"
-    puts "Введите 5, если вы хотите отцепить вагон от почтового поезда"
-    puts "Введите 5, если вы хотите прицепить вагон к почтовому поезду"
-    puts "Введите 5, если вы хотите увеличить скорость"
-    puts "Введите 5, если вы хотите снизить скорость"
-    puts "Введите 5, если вы хотите остановиться"
+  end
 
-    choice = gets.chomp
-    #Код работы назначения маршрута, прицепки отцепки вагонов...
-  when "3"
-    puts "Введите 1, если вы хотите посмотреть поездана на станции"
-    puts "Введите 2, если вы хотите текущую станцию"
-    puts "Введите 3, если вы хотите предыдущую станцию"
-    puts "Введите 4, если вы хотите количество вагонов пассжирского поезда"
-    puts "Введите 5, если вы хотите количество вагонов почтового поезда"
-    puts "Введите 6, если вы хотите ...."
-    
-    #Код вот этого всего!!!
+  def create_station
+    puts "Введите название станции"
+    name_of_station = gets.chomp
+    new_station = Station.new(name_of_station)
+    puts "Вы создали станцию " + "#{new_station}"
+    @stations << new_station
+    p
+  end
 
-    choice = gets.chomp
+  def create_route
+    puts "Что бы создать маршрут, вы должны были создать как минимум 2 станции"
+    @stations.each_with_index do |index, station|
+      puts "#{index + 1}. #{station.name}"
+    end
+    # 1. Москва
+    # 2. Спб
+    puts "Введите порядковый номер первой станции"
+    first_station = @stations[gets.chomp.to_i - 1]
+    puts "Введите имя второй станции"
+    last_station = @stations[gets.chomp.to_i - 1]
+    route = Route.new(first_station, last_station)
+    @routes << route
+    puts "Маршрут создан: #{route.first_station} - #{route.last_station}"
   end
 end
-
-
-
