@@ -7,6 +7,13 @@ require './vagon.rb'
 require './vagon_p.rb'
 require './vagon_c.rb'
 
+# mga = Station.new("Mga")
+# train = PassengerTrain.new(123)
+# train1 = PassengerTrain.new(456)
+# mga.park_train(train)
+# mga.park_train(train1)
+# mga.show_type_train
+
 class Interface
 
   def initialize
@@ -91,9 +98,9 @@ class Interface
       when 1
         add_route_of_train     
       when 2
-        move_to_next_station  #Сделать
+        move_to_next_station  
       when 3
-        move_back_station     #Сделать
+        move_back_station     
       when 4
         unhook_the_vagon
   	  when 0
@@ -132,29 +139,36 @@ class Interface
     end
   end 
 
-  # def testing_my_programm
-  #   new_station = Station.new("Волхов")      
-  #   @stations << new_station
-  #   new_station = Station.new("Питер")    
-  #   @stations << new_station
-  #   first_station = @stations[0]
-  #   last_station = @stations[1]
-  #   route = Route.new(first_station, last_station)
-  #   @routes << route
-  #   train = PassengerTrain.new(999)
-  #   @trains << train
-  #   train1 = CargoTrain.new(777)
-  #   @trains << train1
-  #   train.get_route(route)
+  def testing_my_programm
+    new_station = Station.new("Волхов")      
+    @stations << new_station
+    new_station = Station.new("Питер")    
+    @stations << new_station
+    first_station = @stations[0]
+    last_station = @stations[1]
+    route = Route.new(first_station, last_station)
+    @routes << route
+    train = PassengerTrain.new(999)
+    @trains << train
+    train1 = CargoTrain.new(777)
+    @trains << train1
+    train.get_route(route)
+    next_station_show
+    show_trains_at_the_station
+    
+    
+
+    
+
   #   add_an_intermediate_station
   #   delete_an_intermediate_station
-  # end 
+  end 
    
   def create_station
     puts "Введите название станции"
     name_of_station = gets.chomp.to_s
     new_station = Station.new(name_of_station)
-    puts "Вы создали станцию " + "- #{name_of_station}"
+    puts "Вы создали станцию - #{name_of_station}"
     @stations << new_station
   end
 
@@ -219,7 +233,11 @@ class Interface
     vagon = PassengerVagon.new(number_vagon)
     "Выберите поезд, к которому хотите прицепить вагон"
     trains_with_index
-    @train.add_vagon(vagon)
+    if @train.add_vagon(vagon) 
+      puts "Прицеплен вагон #{vagon.number}"
+    else
+      puts "Тип вагона и поезда не совпадают или скорость поезда не 0 км/ч"
+    end    
   end  
 
   def create_cargo_vagon
@@ -228,7 +246,11 @@ class Interface
     vagon = CargoVagon.new(number_vagon)
     "Выберите поезд, к которому хотите прицепить вагон"
     trains_with_index
-    @train.add_vagon(vagon)
+    if @train.add_vagon(vagon) 
+      puts "Прицеплен вагон #{vagon.number}"
+    else
+      puts "Тип вагона и поезда не совпадают или скорость поезда не 0 км/ч"
+    end 
   end
 
   def add_route_of_train
@@ -243,24 +265,39 @@ class Interface
   def move_to_next_station
     puts "Выберите поезд, который отправится на следующюю станцию"
     trains_with_index 
-    @train.move_next_station 
+    if @train.route == @route
+      puts "Поезду № #{@train.number} не назначен маршрут"
+    elsif @train.current_station == @train.route.last_station
+      puts "Это последняя станция"
+    else
+      @train.move_next_station
+      puts "Поезд прибыл на станцию: #{@train.current_station.name}"
+    end   
   end  
   
   def move_back_station
     puts "Выберите поезд, который отправится на предыдущую станцию"
-    trains_with_index 
-    @train.move_back_station
+    trains_with_index
+    if @train.route == @route
+      puts "Поезду № #{@train.number} не назначен маршрут"
+    elsif @train.current_station == @train.route.first_station 
+      puts "Это первая станция"
+    else
+      @train.move_back_station
+      puts "Поезд прибыл на станцию: #{@train.current_station.name}"
+    end  
   end
 
   def unhook_the_vagon 
     puts "Выберете поезд от которого хотите отцепить вагон"
-   trains_with_index
+    trains_with_index
     puts "Выберете вагон, который хотите отцепить"
     @train.train_vagons.each_with_index do |vagon, index|
       puts "#{index + 1}. #{vagon.number}"
     end  
     vagon = @train.train_vagons[gets.chomp.to_i - 1]  
     @train.unhook_wagon(vagon)
+    puts "Вагон № #{vagon.number} отцеплен"
   end  
 
   def show_trains_at_the_station
@@ -269,10 +306,12 @@ class Interface
       puts "#{index + 1}. #{station.name}"
     end
     station = @stations[gets.chomp.to_i - 1] 
-    if station.trains.size == 0
+    if station.the_trains.size == 0
       puts "На станции нет поездов"
     else
-      @trains.each {|train| puts "Поезд #{train.number} находится на станции"}
+      station.the_trains.each {|train| puts "Поезд #{train.number} находится на станции"}
+      puts "Пассажирских поездов на станции: #{station.the_trains.select {|train| train.type == "passenger"}.size}"
+      puts "Почтовых поездов на станции: #{station.the_trains.select {|train| train.type == "cargo"}.size}"
     end
   end 
 
@@ -289,9 +328,17 @@ class Interface
   end
 
   def back_statioт_show
-     puts "Выберите поезд, предыдущую станцию которого вы хотите узнать"
+    puts "Выберите поезд, предыдущую станцию которого вы хотите узнать"
     trains_with_index
-    puts @train.show_back_station.name 
+    if @train.route == @route
+      puts "Поезду № #{@train.number} не назначен маршрут"
+
+    elsif @train.current_station == @train.route.first_station
+      puts "Это первая станция"
+    else  
+      @train.show_back_station
+      puts @train.route.all_station[@train.index_current_station - 1].name
+    end   
   end
   
   def current_station_show
@@ -303,7 +350,13 @@ class Interface
   def next_station_show
     puts "Выберите поезд, следующую станцию которого вы хотите узнать"
     trains_with_index
-    puts @train.next_station.name
+    if @train.route == @route
+      puts "Поезду № #{@train.number} не назначен маршрут" 
+    elsif @train.current_station == @train.route.last_station
+      puts "Это последняя станция"
+    else  
+      puts @train.next_station.name
+    end  
   end
 
   private 
@@ -323,7 +376,7 @@ class Interface
   end  
 end
     
-Interface.new.start!
+Interface.new.testing_my_programm
 
 
 
