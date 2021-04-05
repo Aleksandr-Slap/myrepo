@@ -18,6 +18,7 @@ class Station
     @name= name
     @the_trains = []
     @@name_stations << name
+    register_instance
   end
 
   def park_train(train)

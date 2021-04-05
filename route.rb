@@ -13,6 +13,7 @@ class Route
     @first_station = first_station
     @last_station = last_station
     @intermediate_stations = intermediate_stations
+    register_instance
   end
 
   def add_station(station)
