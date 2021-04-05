@@ -1,4 +1,6 @@
-require './module.rb'
+
+require './module_manufacturer.rb'
+require './module_instanse_class_method.rb'
 
 class Train
 
@@ -16,7 +18,7 @@ class Train
     @speed = 0
     @train_vagons = []
     @@trains << self
-    instances
+    register_instance
   end
 
   def self.find(number_of_train)
@@ -72,4 +74,5 @@ class Train
     @route.all_station.index(@current_station)
   end
 end
+
 
