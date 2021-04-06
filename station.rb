@@ -1,11 +1,12 @@
 
-require './module_instanse_class_method.rb'
+require './instanse_counter.rb'
 
 class Station
 
   include InstanceCounter
 
   @@name_stations = []
+  @instances = 0
 
   attr_reader :the_trains, :name
   

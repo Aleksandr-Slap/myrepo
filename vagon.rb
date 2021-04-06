@@ -1,4 +1,4 @@
-
+require './manufacturer.rb'
 
 class Vagon
 

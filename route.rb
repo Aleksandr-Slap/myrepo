@@ -1,9 +1,11 @@
 
-require './module_instanse_class_method.rb'
+require './instanse_counter.rb'
 
 class Route
 
   include InstanceCounter
+
+  @instances = 0
   
   attr_reader :first_station, :last_station, :intermediate_stations
 
