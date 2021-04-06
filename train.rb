@@ -1,6 +1,6 @@
 
-require './module_manufacturer.rb'
-require './module_instanse_class_method.rb'
+require './manufacturer.rb'
+require './instanse_counter.rb'
 
 class Train
 
@@ -8,6 +8,7 @@ class Train
   include Manufacturer
 
   @@trains = []
+  
 
   attr_accessor :speed, :current_station, :train_vagons
   attr_reader :type, :number, :route, :speed
@@ -19,6 +20,7 @@ class Train
     @train_vagons = []
     @@trains << self
     register_instance
+    self.class.instances
   end
 
   def self.find(number_of_train)
@@ -74,5 +76,4 @@ class Train
     @route.all_station.index(@current_station)
   end
 end
-
 
