@@ -13,7 +13,9 @@ class Train
   attr_accessor :speed, :current_station, :train_vagons
   attr_reader :type, :number, :route, :speed
 
-  def initialize(number)
+  FORMAT_NUMBER = /^.{3}.{0,1}.{2}$/
+
+  def initialize(number, type)
     @number = number
     @type = type
     @speed = 0
@@ -21,6 +23,19 @@ class Train
     @@trains << self
     register_instance
     self.class.instances
+    validate!
+  end
+
+  def valid?(object)
+    if object.class == Train || PassengerTrain || CargoTrain
+      self.number.length > 4 and ['passenger', 'cargo'].include?(@type)   
+    end  
+  end  
+
+  def validate!
+    raise "Invalid number format" if number !~ FORMAT_NUMBER
+    raise "The number is too short (min. 5 simbols)" if number.length < 5
+    raise "Type must have been passenger or cargo" if type != 'passenger' && type != 'cargo'
   end
 
   def self.find(number_of_train)

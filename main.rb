@@ -9,6 +9,8 @@ require './vagon_c.rb'
 
 class Interface
 
+  FORMAT_NUMBER = /^.{3}.{0,1}.{2}$/
+
   def initialize
     @stations = []
     @trains = []
@@ -131,31 +133,6 @@ class Interface
       end
     end
   end 
-
-  # def testing_my_programm
-  #   new_station = Station.new("Волхов")      
-  #   @stations << new_station
-  #   new_station = Station.new("Питер")    
-  #   @stations << new_station
-  #   first_station = @stations[0]
-  #   last_station = @stations[1]
-  #   route = Route.new(first_station, last_station)
-  #   @routes << route
-  #   train = PassengerTrain.new(999)
-  #   @trains << train
-  #   train1 = CargoTrain.new(777)
-  #   @trains << train1
-  #   train.get_route(route)
-  #   next_station_show
-  #   show_trains_at_the_station
-    
-    
-
-    
-
-  # #   add_an_intermediate_station
-  # #   delete_an_intermediate_station
-  # end 
    
   def create_station
     puts "Введите название станции"
@@ -204,20 +181,27 @@ class Interface
     @stations.delete(station) 
   end  
 
-  def create_pass_train
-  	puts "Введите номер поезда"
+  def create_pass_train 
+    puts "Введите номер поезда"
     number = gets.chomp
     train = PassengerTrain.new(number)
     @trains << train
-    @trains.each {|train| puts "Создан поезд под номером #{number}"}
+    @trains.each {|train| puts "Создан пассажирский поезд под номером #{number}"}
+  rescue RuntimeError => e 
+    puts "RuntimeError: #{e.message}"
+    retry if @number !~ FORMAT_NUMBER
   end
+  
 
   def create_cargo_train 
   	puts "Введите номер поезда"
     number = gets.chomp
     train = CargoTrain.new(number)
     @trains << train
-    @trains.each {|train| puts "Создан поезд под номером #{number}"}
+    @trains.each {|train| puts "Создан почтовый поезд под номером #{number}"}
+  rescue RuntimeError => e 
+    puts "RuntimeError: #{e.message}"
+    retry if @number !~ FORMAT_NUMBER
   end 
 
   def create_pass_vagon
