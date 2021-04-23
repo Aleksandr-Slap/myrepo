@@ -2,8 +2,12 @@ require './vagon.rb'
 
 class CargoVagon < Vagon
 
-	def initialize (number, type_vagon = 'cargo')
+	def initialize (number, places, type_vagon = "cargo")
 	  super
-	  @type_vagon = type_vagon
+  end
+
+  def download(number_of_cubic_meters)
+		@places -= number_of_cubic_meters
+		@occupied_places += number_of_cubic_meters
   end
 end

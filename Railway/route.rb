@@ -26,8 +26,8 @@ class Route
   end
 
   def validate!
-   raise "Station name is too short" if first_station.length < 2 || last_station.length < 2
-   raise "Station name is capitalized" if first_station != first_station.capitalize || last_station != last_station.capitalize
+   raise "Station name is too short" if first_station.name.length < 2 || last_station.name.length < 2
+   raise "Station name is capitalized" if first_station.name != first_station.name.capitalize || last_station.name != last_station.name.capitalize
   end  
 
   def add_station(station)

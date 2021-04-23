@@ -83,6 +83,9 @@ class Interface
       puts "Введите 2, если вы хотите проследовать на следующую станцию"
       puts "Введите 3, если вы хотите проследовать на предыдущую станцию"
       puts "Введите 4, если вы хотите отцепить вагон поезда"
+      puts "Введите 5, если вы хотите занять место в пассажирском вагоне"
+      puts "Введите 6, если вы хотите загрузить почтовый вагон"
+
       puts "Введите 0, если вы хотите остановиться"
 
 
@@ -98,7 +101,11 @@ class Interface
         move_back_station     
       when 4
         unhook_the_vagon
-  	  when 0
+      when 5
+        take_place
+      when 6
+        download_vagon
+      when 0
         break
       end
     end
@@ -150,7 +157,7 @@ class Interface
     end
     puts "Введите порядковый номер первой станции"
     first_station = @stations[gets.chomp.to_i - 1]
-    puts "Введите имя второй станции"
+    puts "Введите порядковый номер второй станции"
     last_station = @stations[gets.chomp.to_i - 1]
     route = Route.new(first_station, last_station)
     @routes << route
@@ -207,7 +214,9 @@ class Interface
   def create_pass_vagon
     puts "Введите номер вагона"
     number_vagon = gets.chomp
-    vagon = PassengerVagon.new(number_vagon)
+    puts "Укажите количество мест в вагоне"
+    places = gets.chomp.to_i
+    vagon = PassengerVagon.new(number_vagon, places)
     "Выберите поезд, к которому хотите прицепить вагон"
     trains_with_index
     if @train.add_vagon(vagon) 
@@ -220,7 +229,9 @@ class Interface
   def create_cargo_vagon
     puts "Введите номер вагона"
     number_vagon = gets.chomp
-    vagon = CargoVagon.new(number_vagon)
+    puts "Укажите объём вагона куб.метрах"
+    places =  gets.chomp.to_i
+    vagon = CargoVagon.new(number_vagon, places)
     "Выберите поезд, к которому хотите прицепить вагон"
     trains_with_index
     if @train.add_vagon(vagon) 
@@ -255,7 +266,7 @@ class Interface
   def move_back_station
     puts "Выберите поезд, который отправится на предыдущую станцию"
     trains_with_index
-    if @train.route == @route
+    if @train.route != @route
       puts "Поезду № #{@train.number} не назначен маршрут"
     elsif @train.current_station == @train.route.first_station 
       puts "Это первая станция"
@@ -275,21 +286,48 @@ class Interface
     vagon = @train.train_vagons[gets.chomp.to_i - 1]  
     @train.unhook_wagon(vagon)
     puts "Вагон № #{vagon.number} отцеплен"
-  end  
+  end
+
+  def take_place
+    puts "Выберите поезд, в вогоне которого хотите занять место"
+    trains_with_index
+    if @train.type != "passenger"
+      puts "Вы можете занять место только в пассажирском поезде"
+    else
+      vagons_with_index
+      @vagon.take_the_place
+    end   
+  end
+
+  def download_vagon
+    puts "Выберите поезд, вагон которого хотите загрузить"
+    trains_with_index
+    if @train.type != "cargo"
+      puts "Вы можете загрузить только почтовый  состав"
+    else
+      vagons_with_index
+      puts "Укажите обьем в куб.метрах, который хотите занять"
+      volume = gets.chomp.to_i
+      @vagon.download(volume)
+    end
+  end    
+      
+
 
   def show_trains_at_the_station
-    puts "Введите номер станции, чтобы узнать есть ли на ней поезда"
-    @stations.each_with_index do |station, index|
-      puts "#{index + 1}. #{station.name}"
-    end
-    station = @stations[gets.chomp.to_i - 1] 
-    if station.the_trains.size == 0
-      puts "На станции нет поездов"
-    else
-      station.the_trains.each {|train| puts "Поезд #{train.number} находится на станции"}
-      puts "Пассажирских поездов на станции: #{station.the_trains.select {|train| train.type == "passenger"}.size}"
-      puts "Почтовых поездов на станции: #{station.the_trains.select {|train| train.type == "cargo"}.size}"
-    end
+    Station.all_stations
+    # puts "Введите номер станции, чтобы узнать есть ли на ней поезда"
+    # @stations.each_with_index do |station, index|
+    #   puts "#{index + 1}. #{station.name}"
+    # end
+    # station = @stations[gets.chomp.to_i - 1] 
+    # if station.the_trains.size == 0
+    #   puts "На станции нет поездов"
+    # else
+    #   station.the_trains.each {|train| puts "Поезд #{train.number} находится на станции"}
+    #   puts "Пассажирских поездов на станции: #{station.the_trains.select {|train| train.type == "passenger"}.size}"
+    #   puts "Почтовых поездов на станции: #{station.the_trains.select {|train| train.type == "cargo"}.size}"
+    # end
   end 
 
   def show_train_vagon
@@ -298,16 +336,14 @@ class Interface
     if @train.train_vagons.size == 0
       puts "У данного поезда нет прицепленых вагонов"
     else
-      @train.train_vagons.each_with_index do |vagon, index|
-        puts "#{index + 1}. #{vagon.number}"                       
-      end  
+      @train.all_vagons{ |vagon|puts "Номер вагона: #{vagon.number}"; puts "Свободный объём/места: #{vagon.places}"; puts "Занятый объём/места: #{vagon.occupied_places}"}
     end  
   end
 
   def back_statioт_show
     puts "Выберите поезд, предыдущую станцию которого вы хотите узнать"
     trains_with_index
-    if @train.route == @route
+    if @train.route != @route
       puts "Поезду № #{@train.number} не назначен маршрут"
 
     elsif @train.current_station == @train.route.first_station
@@ -327,7 +363,7 @@ class Interface
   def next_station_show
     puts "Выберите поезд, следующую станцию которого вы хотите узнать"
     trains_with_index
-    if @train.route == @route
+    if @train.route != @route
       puts "Поезду № #{@train.number} не назначен маршрут" 
     elsif @train.current_station == @train.route.last_station
       puts "Это последняя станция"
@@ -337,6 +373,14 @@ class Interface
   end
 
   private 
+
+  def vagons_with_index
+    puts "Выберете номер вагона"
+    @train.train_vagons.each_with_index do |vagon, index|
+      puts "#{index + 1}. Вагон номер: #{vagon.number}"
+    end  
+    @vagon = @train.train_vagons[gets.chomp.to_i - 1]
+  end    
 
   def trains_with_index
     @trains.each_with_index do |train, index|
@@ -354,6 +398,22 @@ class Interface
 end
     
 Interface.new.start!
+# train1 = PassengerTrain.new('12345')
+# train2 = CargoTrain.new('54321')
+# train3 = PassengerTrain.new('41325')
+# vagon1 = PassengerVagon.new('1234567', 50)
+# vagon2 = CargoVagon.new('7654321', 30)
+# vagon3 = PassengerVagon.new('7162534', 40)
+# train1.add_vagon(vagon1)
+# train2.add_vagon(vagon2)
+# train3.add_vagon(vagon3)
+# volhov = Station.new("Volhov")
+# mga = Station.new("Mga")
+# spb = Station.new("Spb")
+# volhov.park_train(train1)
+# mga.park_train(train2)
+# spb.park_train(train3)  
+# Station.all_stations
 
 
 

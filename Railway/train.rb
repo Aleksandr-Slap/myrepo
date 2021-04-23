@@ -46,6 +46,10 @@ class Train
     @speed = 0
   end
 
+  def all_vagons
+    @train_vagons.each { |vagon| yield vagon}
+  end  
+
   def add_vagon(vagon)
     if @type == vagon.type_vagon && speed == 0
       @train_vagons << vagon
