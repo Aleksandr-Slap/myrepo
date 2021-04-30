@@ -1,14 +1,14 @@
-require './vagon.rb'
+# frozen_string_literal: true
 
-class PassengerVagon  < Vagon
+require './vagon'
 
-	def initialize (number, places, type_vagon = "passenger")
-	  super
-	end
+class PassengerVagon < Vagon
+  def initialize(number, places, type_vagon = 'passenger')
+    super
+  end
 
-	def take_the_place
-		@occupied_places += 1
-		@places -= 1
-	end
-
-end	
+  def take_the_place
+    @occupied_places += 1
+    @places -= 1
+  end
+end

@@ -1,9 +1,10 @@
-require './train.rb'
+# frozen_string_literal: true
 
-class PassengerTrain < Train 
+require './train'
 
-  def initialize(number, type = "passenger")
-	super
-	@type = type
-  end	
-end 		 	 
+class PassengerTrain < Train
+  def initialize(number, type = 'passenger')
+    super
+    @type = type
+  end
+end
