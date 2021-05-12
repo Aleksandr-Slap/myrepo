@@ -2,32 +2,42 @@
 
 require './manufacturer'
 require './instanse_counter'
+require './acсessors'
 
 class Train
+
+  extend Acсessors
+  # include Acсessors::Instance
   include InstanceCounter
   include Manufacturer
 
-  # rubocop:disable Style/ClassVars
 
+  # rubocop:disable Style/ClassVars
+  @stored_value = []
   @@trains = []
 
   # rubocop:enable Style/ClassVars
 
-  attr_accessor :speed, :current_station, :train_vagons
-  attr_reader :type, :number, :route
+  strong_attr_accessor :type, String
+
+  # attr_accessor_with_history :type, :number, :speed
+
+  # attr_accessor :speed, :current_station, :train_vagons
+  # attr_reader :type, :number, :route
 
   FORMAT_NUMBER = /^.{3}.{0,1}.{2}$/
 
   def initialize(number, type)
     @number = number
     @type = type
-    @speed = 0
+    # @speed = 0
     @train_vagons = []
     @@trains << self
     register_instance
     self.class.instances
-    validate!
+    # validate!
   end
+
 
   # rubocop:disable Style/GuardClause
 
@@ -99,3 +109,13 @@ class Train
     @route.all_station.index(@current_station)
   end
 end
+
+p train = Train.new("12345", "cargo")
+p train.type
+p train.type = 123
+
+
+
+
+
+
